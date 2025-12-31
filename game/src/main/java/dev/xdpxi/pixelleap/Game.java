@@ -75,7 +75,7 @@ public class Game {
             window = glfwCreateWindow(
                 Main.width,
                 Main.height,
-                "Pixelbound",
+                "Pixel Leap",
                 NULL,
                 NULL
             );
