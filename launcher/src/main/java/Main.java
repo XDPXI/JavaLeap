@@ -49,7 +49,7 @@ public class Main {
 
     private static void initUI() {
         SwingUtilities.invokeLater(() -> {
-            frame = new JFrame("Pixel Leap - Launcher");
+            frame = new JFrame("Pixel Leap Launcher (1.0.4)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(330, 180);
             frame.setLayout(new BorderLayout());
@@ -172,7 +172,6 @@ public class Main {
         String downloadDirPath = switch (os) {
             case "windows" -> GAME_DOWNLOAD_DIR_WINDOWS;
             case "macos" -> GAME_DOWNLOAD_DIR_MACOS;
-            case "linux" -> GAME_DOWNLOAD_DIR_LINUX;
             default -> GAME_DOWNLOAD_DIR_LINUX;
         };
 
