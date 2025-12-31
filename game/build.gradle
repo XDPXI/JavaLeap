@@ -1,53 +1,35 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'dev.xdpxi'
 version = '1.0.0-beta.9'
 
-
-import org.codehaus.groovy.runtime.GStringImpl
-import org.gradle.internal.os.OperatingSystem
-
-project.ext.lwjglVersion = "3.3.6"
-
-switch (OperatingSystem.current()) {
-	case OperatingSystem.FREE_BSD:
-        project.ext.lwjglNatives = "natives-freebsd" as GStringImpl
-		break
-	case OperatingSystem.LINUX:
-        project.ext.lwjglNatives = "natives-linux" as GStringImpl
-		def osArch = System.getProperty("os.arch")
-		if (osArch.startsWith("arm") || osArch.startsWith("aarch64")) {
-			project.ext.lwjglNatives += osArch.contains("64") || osArch.startsWith("armv8") ? "-arm64" : "-arm32"
-		} else if (osArch.startsWith("ppc")) {
-			project.ext.lwjglNatives += "-ppc64le"
-		} else if (osArch.startsWith("riscv")) {
-			project.ext.lwjglNatives += "-riscv64"
-		}
-		break
-	case OperatingSystem.MAC_OS:
-        project.ext.lwjglNatives = System.getProperty("os.arch").startsWith("aarch64") ? "natives-macos-arm64" : "natives-macos" as GStringImpl
-		break
-	case OperatingSystem.WINDOWS:
-		def osArch = System.getProperty("os.arch")
-		project.ext.lwjglNatives = osArch.contains("64")
-				? "natives-windows${osArch.startsWith("aarch64") ? "-arm64" : ""}"
-                : "natives-windows-x86" as GStringImpl
-		break
-}
+ext.lwjglVersion = "3.3.6"
 
 repositories {
     mavenCentral()
     maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
+def lwjglNativesList = [
+    "natives-windows",
+    "natives-windows-x86",
+    "natives-windows-arm64",
+    "natives-linux",
+    "natives-linux-arm32",
+    "natives-linux-arm64",
+    "natives-macos",
+    "natives-macos-arm64"
+]
+
 dependencies {
     testImplementation platform('org.junit:junit-bom:6.0.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    implementation("com.formdev:flatlaf:3.7")
+    implementation "com.formdev:flatlaf:3.7"
 
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
     implementation "org.lwjgl:lwjgl"
@@ -56,12 +38,15 @@ dependencies {
     implementation "org.lwjgl:lwjgl-openal"
     implementation "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
-    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-assimp::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+
+    lwjglNativesList.each { n ->
+        runtimeOnly "org.lwjgl:lwjgl::$n"
+        runtimeOnly "org.lwjgl:lwjgl-assimp::$n"
+        runtimeOnly "org.lwjgl:lwjgl-glfw::$n"
+        runtimeOnly "org.lwjgl:lwjgl-openal::$n"
+        runtimeOnly "org.lwjgl:lwjgl-opengl::$n"
+        runtimeOnly "org.lwjgl:lwjgl-stb::$n"
+    }
 }
 
 application {
@@ -69,15 +54,19 @@ application {
     applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
 }
 
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
-    }
+shadowJar {
+    archiveClassifier.set("")
+    configurations = [project.configurations.runtimeClasspath]
+
     manifest {
         attributes(
                 'Main-Class': 'dev.xdpxi.pixelleap.Main'
         )
     }
+}
+
+jar {
+    enabled = false
 }
 
 test {
