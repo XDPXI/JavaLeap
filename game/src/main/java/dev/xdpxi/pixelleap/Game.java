@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Game {
+
     private static final double ORTHO_NEAR = -1.0;
     private static final double ORTHO_FAR = 1.0;
     public static long window;
@@ -18,10 +19,6 @@ public class Game {
     private float cameraY = 0f;
 
     public static void main(String[] args) {
-        if (System.getProperty("os.name").toLowerCase().contains("mac") && !System.getProperty("java.vm.name").toLowerCase().contains("openjdk")) {
-            Log.error("On macOS, this application must be run with -XstartOnFirstThread JVM argument");
-            System.exit(1);
-        }
         Log.info("Game main method called");
         new Game().run("map1", Maps.currentMap);
     }
@@ -34,7 +31,9 @@ public class Game {
     }
 
     public void run(String mapID, int mapNumber) {
-        Log.info("Starting game with mapID: " + mapID + ", mapNumber: " + mapNumber);
+        Log.info(
+                "Starting game with mapID: " + mapID + ", mapNumber: " + mapNumber
+        );
         Maps.currentMap = mapNumber;
         if (mapID == null) {
             Log.error("MapID is null. Exiting game.");
@@ -71,7 +70,13 @@ public class Game {
             glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
             Log.info("Creating GLFW window");
-            window = glfwCreateWindow(Main.width, Main.height, "Pixelbound", NULL, NULL);
+            window = glfwCreateWindow(
+                    Main.width,
+                    Main.height,
+                    "Pixelbound",
+                    NULL,
+                    NULL
+            );
             if (window == NULL) {
                 Log.error("Failed to create the GLFW window");
                 throw new RuntimeException("Failed to create the GLFW window");
@@ -95,8 +100,14 @@ public class Game {
             Log.error("Window creation failed: " + e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            Log.error("Unexpected error during initialization: " + e.getMessage(), e);
-            throw new RuntimeException("Initialization failed: " + e.getMessage(), e);
+            Log.error(
+                    "Unexpected error during initialization: " + e.getMessage(),
+                    e
+            );
+            throw new RuntimeException(
+                    "Initialization failed: " + e.getMessage(),
+                    e
+            );
         } finally {
             if (window == NULL) {
                 glfwTerminate();
@@ -107,10 +118,24 @@ public class Game {
     private void setupProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Main.width / zoom, 0, Main.height / zoom, ORTHO_NEAR, ORTHO_FAR);
+        glOrtho(
+                0,
+                Main.width / zoom,
+                0,
+                Main.height / zoom,
+                ORTHO_NEAR,
+                ORTHO_FAR
+        );
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        Log.info("Projection matrix set up with dimensions: " + Main.width + "x" + Main.height + ", zoom: " + zoom);
+        Log.info(
+                "Projection matrix set up with dimensions: " +
+                        Main.width +
+                        "x" +
+                        Main.height +
+                        ", zoom: " +
+                        zoom
+        );
     }
 
     private void loop() {
@@ -161,27 +186,60 @@ public class Game {
         drawRect(Player.X, Player.Y, Player.WIDTH, Player.HEIGHT, "#FF3131");
 
         for (Maps.Platform platform : Maps.platforms) {
-            if (isRectVisible(platform.x(), platform.y(), platform.width(), platform.height())) {
-                drawRect(platform.x(), platform.y(), platform.width(), platform.height(), platform.color());
+            if (
+                    isRectVisible(
+                            platform.x(),
+                            platform.y(),
+                            platform.width(),
+                            platform.height()
+                    )
+            ) {
+                drawRect(
+                        platform.x(),
+                        platform.y(),
+                        platform.width(),
+                        platform.height(),
+                        platform.color()
+                );
             }
         }
     }
 
-    private void drawRect(float x, float y, float width, float height, String color) {
+    private void drawRect(
+            float x,
+            float y,
+            float width,
+            float height,
+            String color
+    ) {
         if (isRectVisible(x, y, width, height)) {
             float[] rgb = hexToRGB(color);
-            float[] darkerRgb = {Math.max(rgb[0] * 0.8f, 0), Math.max(rgb[1] * 0.8f, 0), Math.max(rgb[2] * 0.8f, 0)};
+            float[] darkerRgb = {
+                    Math.max(rgb[0] * 0.8f, 0),
+                    Math.max(rgb[1] * 0.8f, 0),
+                    Math.max(rgb[2] * 0.8f, 0),
+            };
             drawQuad(x, y, width, height, darkerRgb);
             drawQuad(x + 4, y + 4, width - 8, height - 8, rgb);
         }
     }
 
     private boolean isRectVisible(float x, float y, float width, float height) {
-        return (x + width >= cameraX - Main.width / zoom) && (x <= cameraX + Main.width / zoom) &&
-                (y + height >= cameraY - Main.height / zoom) && (y <= cameraY + Main.height / zoom);
+        return (
+                (x + width >= cameraX - Main.width / zoom) &&
+                        (x <= cameraX + Main.width / zoom) &&
+                        (y + height >= cameraY - Main.height / zoom) &&
+                        (y <= cameraY + Main.height / zoom)
+        );
     }
 
-    private void drawQuad(float x, float y, float width, float height, float[] color) {
+    private void drawQuad(
+            float x,
+            float y,
+            float width,
+            float height,
+            float[] color
+    ) {
         glBegin(GL_QUADS);
         glColor3f(color[0], color[1], color[2]);
         glVertex2f(x, y);

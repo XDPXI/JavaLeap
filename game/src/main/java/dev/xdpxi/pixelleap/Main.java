@@ -11,13 +11,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Main {
+
     public static int width = 1920;
     public static int height = 1080;
 
     public static void main(String[] args) {
         Log.info("Application started");
-        if (System.getProperty("os.name").toLowerCase().contains("mac") && !System.getProperty("java.vm.name").toLowerCase().contains("openjdk")) {
-            Log.error("On macOS, this application must be run with -XstartOnFirstThread JVM argument");
+        if (
+                System.getProperty("os.name").toLowerCase().contains("mac") &&
+                        !System.getProperty("java.vm.name")
+                                .toLowerCase()
+                                .contains("openjdk")
+        ) {
+            Log.error(
+                    "On macOS, this application must be run with -XstartOnFirstThread JVM argument"
+            );
             System.exit(1);
         }
 
@@ -39,13 +47,18 @@ public class Main {
         return Arrays.stream(args)
                 .filter(arg -> arg.startsWith("--map"))
                 .findFirst()
-                .map(arg -> arg.contains("=") ? arg.split("=")[1] : args[Arrays.asList(args).indexOf(arg) + 1])
+                .map(arg ->
+                        arg.contains("=")
+                                ? arg.split("=")[1]
+                                : args[Arrays.asList(args).indexOf(arg) + 1]
+                )
                 .orElse(null);
     }
 
     private static void getWidthAndHeight() {
         Log.info("Retrieving screen dimensions");
-        GraphicsDevice defaultScreen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        GraphicsDevice defaultScreen =
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode displayMode = defaultScreen.getDisplayMode();
         width = displayMode.getWidth();
         height = displayMode.getHeight();
@@ -59,28 +72,52 @@ public class Main {
             Log.info("FlatDarkLaf look and feel set successfully");
         } catch (UnsupportedLookAndFeelException e) {
             Log.error("Failed to set FlatDarkLaf look and feel", e);
-            JOptionPane.showMessageDialog(null, "Failed to set FlatDarkLaf look and feel");
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Failed to set FlatDarkLaf look and feel"
+            );
         }
     }
 
     public static void restartApplication(int mapID) throws IOException {
         Log.info("Restarting application with map ID: " + mapID);
-        String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        String javaBin =
+                System.getProperty("java.home") +
+                        File.separator +
+                        "bin" +
+                        File.separator +
+                        "java";
 
-        File currentFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        File currentFile = new File(
+                Main.class.getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .getPath()
+        );
         Log.info("Current file: " + currentFile);
 
         if (!currentFile.exists()) {
-            throw new IOException("Unable to locate the running application file.");
+            throw new IOException(
+                    "Unable to locate the running application file."
+            );
         }
 
         ArrayList<String> command = new ArrayList<>();
         command.add(javaBin);
 
         if (currentFile.getName().endsWith(".jar")) {
-            command.addAll(Arrays.asList("-jar", currentFile.getPath(), "--map=" + mapID));
+            command.addAll(
+                    Arrays.asList("-jar", currentFile.getPath(), "--map=" + mapID)
+            );
         } else {
-            command.addAll(Arrays.asList("-cp", currentFile.getPath(), Main.class.getName(), "--map=" + mapID));
+            command.addAll(
+                    Arrays.asList(
+                            "-cp",
+                            currentFile.getPath(),
+                            Main.class.getName(),
+                            "--map=" + mapID
+                    )
+            );
         }
 
         Log.info("Executing command: " + String.join(" ", command));

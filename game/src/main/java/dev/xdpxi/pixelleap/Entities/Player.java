@@ -7,6 +7,7 @@ import dev.xdpxi.pixelleap.Util.Log;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Player {
+
     public static final float WIDTH = 50f;
     public static final float HEIGHT = 50f;
     public static boolean isGrounded = false;
@@ -21,7 +22,9 @@ public class Player {
         if (isKeyPressed(GLFW_KEY_A, GLFW_KEY_LEFT)) {
             X -= getAdjustedSpeed();
         }
-        if (isKeyPressed(GLFW_KEY_W, GLFW_KEY_UP, GLFW_KEY_SPACE) && isGrounded) {
+        if (
+                isKeyPressed(GLFW_KEY_W, GLFW_KEY_UP, GLFW_KEY_SPACE) && isGrounded
+        ) {
             velocityY = getAdjustedJump();
             isGrounded = false;
         }
@@ -83,13 +86,19 @@ public class Player {
     }
 
     public static boolean checkCollision(Maps.Platform platform) {
-        return X + WIDTH > platform.x() && X < platform.x() + platform.width() &&
-                Y <= platform.y() + platform.height() && Y + HEIGHT >= platform.y();
+        return (
+                X + WIDTH > platform.x() &&
+                        X < platform.x() + platform.width() &&
+                        Y <= platform.y() + platform.height() &&
+                        Y + HEIGHT >= platform.y()
+        );
     }
 
     public static float getAdjustedSpeed() {
         for (Maps.Platform platform : Maps.platforms) {
-            if (checkCollision(platform) && "#FF10F0".equals(platform.color())) {
+            if (
+                    checkCollision(platform) && "#FF10F0".equals(platform.color())
+            ) {
                 Log.debug("Speed boost applied");
                 return 10f;
             }
@@ -99,7 +108,9 @@ public class Player {
 
     public static float getAdjustedJump() {
         for (Maps.Platform platform : Maps.platforms) {
-            if (checkCollision(platform) && "#FFAA33".equals(platform.color())) {
+            if (
+                    checkCollision(platform) && "#FFAA33".equals(platform.color())
+            ) {
                 Log.debug("Jump boost applied");
                 return 20f;
             }
