@@ -1,10 +1,10 @@
 package dev.xdpxi.pixelleap.Entities;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 import dev.xdpxi.pixelleap.Game;
 import dev.xdpxi.pixelleap.Maps;
 import dev.xdpxi.pixelleap.Util.Log;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class Player {
 
@@ -15,15 +15,17 @@ public class Player {
     public static float Y = 0f;
     public static float velocityY = 0f;
 
-    public static void handleMovement() {
+    public static void handleMovement(double deltaTime) {
+        float adjustedSpeed = getAdjustedSpeed() * (float) deltaTime * 60f;
+
         if (isKeyPressed(GLFW_KEY_D, GLFW_KEY_RIGHT)) {
-            X += getAdjustedSpeed();
+            X += adjustedSpeed;
         }
         if (isKeyPressed(GLFW_KEY_A, GLFW_KEY_LEFT)) {
-            X -= getAdjustedSpeed();
+            X -= adjustedSpeed;
         }
         if (
-                isKeyPressed(GLFW_KEY_W, GLFW_KEY_UP, GLFW_KEY_SPACE) && isGrounded
+            isKeyPressed(GLFW_KEY_W, GLFW_KEY_UP, GLFW_KEY_SPACE) && isGrounded
         ) {
             velocityY = getAdjustedJump();
             isGrounded = false;
@@ -87,17 +89,17 @@ public class Player {
 
     public static boolean checkCollision(Maps.Platform platform) {
         return (
-                X + WIDTH > platform.x() &&
-                        X < platform.x() + platform.width() &&
-                        Y <= platform.y() + platform.height() &&
-                        Y + HEIGHT >= platform.y()
+            X + WIDTH > platform.x() &&
+            X < platform.x() + platform.width() &&
+            Y <= platform.y() + platform.height() &&
+            Y + HEIGHT >= platform.y()
         );
     }
 
     public static float getAdjustedSpeed() {
         for (Maps.Platform platform : Maps.platforms) {
             if (
-                    checkCollision(platform) && "#FF10F0".equals(platform.color())
+                checkCollision(platform) && "#FF10F0".equals(platform.color())
             ) {
                 Log.debug("Speed boost applied");
                 return 10f;
@@ -109,7 +111,7 @@ public class Player {
     public static float getAdjustedJump() {
         for (Maps.Platform platform : Maps.platforms) {
             if (
-                    checkCollision(platform) && "#FFAA33".equals(platform.color())
+                checkCollision(platform) && "#FFAA33".equals(platform.color())
             ) {
                 Log.debug("Jump boost applied");
                 return 20f;

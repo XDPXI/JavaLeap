@@ -1,13 +1,13 @@
 package dev.xdpxi.pixelleap;
 
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
 import dev.xdpxi.pixelleap.Entities.Player;
 import dev.xdpxi.pixelleap.Util.Log;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Game {
 
@@ -17,6 +17,8 @@ public class Game {
     private final float zoom = 1f;
     private float cameraX = 0f;
     private float cameraY = 0f;
+    private double deltaTime = 0.0;
+    private double lastFrameTime = 0.0;
 
     public static void main(String[] args) {
         Log.info("Game main method called");
@@ -27,12 +29,12 @@ public class Game {
         int r = Integer.parseInt(hex.substring(1, 3), 16);
         int g = Integer.parseInt(hex.substring(3, 5), 16);
         int b = Integer.parseInt(hex.substring(5, 7), 16);
-        return new float[]{r / 255f, g / 255f, b / 255f};
+        return new float[] { r / 255f, g / 255f, b / 255f };
     }
 
     public void run(String mapID, int mapNumber) {
         Log.info(
-                "Starting game with mapID: " + mapID + ", mapNumber: " + mapNumber
+            "Starting game with mapID: " + mapID + ", mapNumber: " + mapNumber
         );
         Maps.currentMap = mapNumber;
         if (mapID == null) {
@@ -71,11 +73,11 @@ public class Game {
 
             Log.info("Creating GLFW window");
             window = glfwCreateWindow(
-                    Main.width,
-                    Main.height,
-                    "Pixelbound",
-                    NULL,
-                    NULL
+                Main.width,
+                Main.height,
+                "Pixelbound",
+                NULL,
+                NULL
             );
             if (window == NULL) {
                 Log.error("Failed to create the GLFW window");
@@ -92,6 +94,7 @@ public class Game {
 
             Log.info("Setting up projection matrix");
             setupProjectionMatrix();
+            lastFrameTime = glfwGetTime();
             Log.info("Game initialization completed successfully");
         } catch (IllegalStateException e) {
             Log.error("GLFW initialization failed: " + e.getMessage(), e);
@@ -101,12 +104,12 @@ public class Game {
             throw e;
         } catch (Exception e) {
             Log.error(
-                    "Unexpected error during initialization: " + e.getMessage(),
-                    e
+                "Unexpected error during initialization: " + e.getMessage(),
+                e
             );
             throw new RuntimeException(
-                    "Initialization failed: " + e.getMessage(),
-                    e
+                "Initialization failed: " + e.getMessage(),
+                e
             );
         } finally {
             if (window == NULL) {
@@ -119,22 +122,22 @@ public class Game {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(
-                0,
-                Main.width / zoom,
-                0,
-                Main.height / zoom,
-                ORTHO_NEAR,
-                ORTHO_FAR
+            0,
+            Main.width / zoom,
+            0,
+            Main.height / zoom,
+            ORTHO_NEAR,
+            ORTHO_FAR
         );
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         Log.info(
-                "Projection matrix set up with dimensions: " +
-                        Main.width +
-                        "x" +
-                        Main.height +
-                        ", zoom: " +
-                        zoom
+            "Projection matrix set up with dimensions: " +
+                Main.width +
+                "x" +
+                Main.height +
+                ", zoom: " +
+                zoom
         );
     }
 
@@ -143,6 +146,7 @@ public class Game {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
 
+            updateDeltaTime();
             update();
             render();
             glfwSwapBuffers(window);
@@ -150,11 +154,17 @@ public class Game {
         Log.info("Game loop ended");
     }
 
+    private void updateDeltaTime() {
+        double currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrameTime;
+        lastFrameTime = currentTime;
+    }
+
     private void update() {
-        Player.handleMovement();
+        Player.handleMovement(deltaTime);
         Player.handlePlatforms();
-        Player.velocityY -= 0.5f;
-        Player.Y += Player.velocityY;
+        Player.velocityY -= 0.5f * (float) deltaTime * 60f;
+        Player.Y += Player.velocityY * (float) deltaTime * 60f;
 
         Player.isGrounded = false;
         for (Maps.Platform platform : Maps.platforms) {
@@ -171,8 +181,16 @@ public class Game {
             Player.isGrounded = true;
         }
 
-        cameraX += (Player.X - cameraX - (Main.width / (2 * zoom))) * 0.1f;
-        cameraY += (Player.Y - cameraY - (Main.height / (2 * zoom))) * 0.1f;
+        cameraX +=
+            (Player.X - cameraX - (Main.width / (2 * zoom))) *
+            0.1f *
+            (float) deltaTime *
+            60f;
+        cameraY +=
+            (Player.Y - cameraY - (Main.height / (2 * zoom))) *
+            0.1f *
+            (float) deltaTime *
+            60f;
     }
 
     private void render() {
@@ -187,37 +205,37 @@ public class Game {
 
         for (Maps.Platform platform : Maps.platforms) {
             if (
-                    isRectVisible(
-                            platform.x(),
-                            platform.y(),
-                            platform.width(),
-                            platform.height()
-                    )
+                isRectVisible(
+                    platform.x(),
+                    platform.y(),
+                    platform.width(),
+                    platform.height()
+                )
             ) {
                 drawRect(
-                        platform.x(),
-                        platform.y(),
-                        platform.width(),
-                        platform.height(),
-                        platform.color()
+                    platform.x(),
+                    platform.y(),
+                    platform.width(),
+                    platform.height(),
+                    platform.color()
                 );
             }
         }
     }
 
     private void drawRect(
-            float x,
-            float y,
-            float width,
-            float height,
-            String color
+        float x,
+        float y,
+        float width,
+        float height,
+        String color
     ) {
         if (isRectVisible(x, y, width, height)) {
             float[] rgb = hexToRGB(color);
             float[] darkerRgb = {
-                    Math.max(rgb[0] * 0.8f, 0),
-                    Math.max(rgb[1] * 0.8f, 0),
-                    Math.max(rgb[2] * 0.8f, 0),
+                Math.max(rgb[0] * 0.8f, 0),
+                Math.max(rgb[1] * 0.8f, 0),
+                Math.max(rgb[2] * 0.8f, 0),
             };
             drawQuad(x, y, width, height, darkerRgb);
             drawQuad(x + 4, y + 4, width - 8, height - 8, rgb);
@@ -226,19 +244,19 @@ public class Game {
 
     private boolean isRectVisible(float x, float y, float width, float height) {
         return (
-                (x + width >= cameraX - Main.width / zoom) &&
-                        (x <= cameraX + Main.width / zoom) &&
-                        (y + height >= cameraY - Main.height / zoom) &&
-                        (y <= cameraY + Main.height / zoom)
+            (x + width >= cameraX - Main.width / zoom) &&
+            (x <= cameraX + Main.width / zoom) &&
+            (y + height >= cameraY - Main.height / zoom) &&
+            (y <= cameraY + Main.height / zoom)
         );
     }
 
     private void drawQuad(
-            float x,
-            float y,
-            float width,
-            float height,
-            float[] color
+        float x,
+        float y,
+        float width,
+        float height,
+        float[] color
     ) {
         glBegin(GL_QUADS);
         glColor3f(color[0], color[1], color[2]);
