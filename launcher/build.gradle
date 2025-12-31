@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'dev.xdpxi'
@@ -14,22 +15,26 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-	implementation("com.formdev:flatlaf:3.5.4")
+	implementation("com.formdev:flatlaf:3.7")
 }
 
 application {
     mainClass = 'Main'
 }
 
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
-    }
+shadowJar {
+    archiveClassifier.set("")
+    configurations = [project.configurations.runtimeClasspath]
+
     manifest {
         attributes(
-            'Main-Class': 'Main'
+                'Main-Class': 'dev.xdpxi.pixelleap.Main'
         )
     }
+}
+
+jar {
+    enabled = false
 }
 
 test {
