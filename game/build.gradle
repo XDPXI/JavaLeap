@@ -69,6 +69,11 @@ jar {
     enabled = false
 }
 
+// Make distribution tasks depend on shadowJar
+distZip.dependsOn shadowJar
+distTar.dependsOn shadowJar
+startScripts.dependsOn shadowJar
+
 test {
     useJUnitPlatform()
 }
