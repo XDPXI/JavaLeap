@@ -37,6 +37,10 @@ jar {
     enabled = false
 }
 
+distZip.dependsOn shadowJar
+distTar.dependsOn shadowJar
+startScripts.dependsOn shadowJar
+
 test {
     useJUnitPlatform()
 }
