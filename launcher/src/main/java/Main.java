@@ -1,6 +1,4 @@
 import com.formdev.flatlaf.FlatDarkLaf;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
@@ -8,18 +6,19 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import javax.swing.*;
 
 public class Main {
 
     private static final String GAME_DOWNLOAD_DIR_WINDOWS =
-            "AppData/Roaming/PixelLeap";
+        "AppData/Roaming/PixelLeap";
     private static final String GAME_DOWNLOAD_DIR_LINUX = ".config/PixelLeap";
     private static final String GAME_DOWNLOAD_DIR_MACOS =
-            "Library/Application Support/PixelLeap";
+        "Library/Application Support/PixelLeap";
     private static final String VERSION_URL =
-            "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/builds";
+        "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/builds";
     private static final String GAME_BASE_URL =
-            "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/";
+        "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/";
     private static JFrame frame;
     private static JProgressBar progressBar;
     private static JButton playButton;
@@ -42,7 +41,7 @@ public class Main {
         if (os.contains("win")) return "windows";
         if (os.contains("mac")) return "macos";
         if (
-                os.contains("nix") || os.contains("nux") || os.contains("aix")
+            os.contains("nix") || os.contains("nux") || os.contains("aix")
         ) return "linux";
         return "unknown";
     }
@@ -96,7 +95,7 @@ public class Main {
                 }
             });
         })
-                .start();
+            .start();
 
         return versionDropdown;
     }
@@ -113,8 +112,8 @@ public class Main {
         playButton.addActionListener((ActionEvent e) -> {
             String selectedVersion = (String) versionDropdown.getSelectedItem();
             if (
-                    selectedVersion != null &&
-                            !selectedVersion.equals("Error fetching versions")
+                selectedVersion != null &&
+                !selectedVersion.equals("Error fetching versions")
             ) {
                 String downloadURL = GAME_BASE_URL + selectedVersion + ".jar";
                 progressBar.setVisible(true);
@@ -150,7 +149,7 @@ public class Main {
                     runGame(gameFile);
                 } catch (IOException | URISyntaxException e) {
                     showErrorDialog(
-                            "Failed to download or run the game. Please check your connection and try again."
+                        "Failed to download or run the game. Please check your connection and try again."
                     );
                     Log.error("Error during game launch", e);
                 }
@@ -176,45 +175,45 @@ public class Main {
         };
 
         File downloadDir = new File(
-                System.getProperty("user.home"),
-                downloadDirPath
+            System.getProperty("user.home"),
+            downloadDirPath
         );
         if (!downloadDir.exists() && !downloadDir.mkdirs()) {
             throw new IOException(
-                    "Failed to create directory: " + downloadDir.getAbsolutePath()
+                "Failed to create directory: " + downloadDir.getAbsolutePath()
             );
         }
         return new File(downloadDir, "game-" + versionName + ".jar");
     }
 
     private static void downloadFile(String fileURL, File gameFile)
-            throws IOException, URISyntaxException {
+        throws IOException, URISyntaxException {
         HttpURLConnection connection = (HttpURLConnection) new URI(fileURL)
-                .toURL()
-                .openConnection();
+            .toURL()
+            .openConnection();
         connection.setRequestMethod("GET");
 
         int contentLength = connection.getContentLength();
         if (contentLength <= 0) throw new IOException(
-                "Failed to retrieve file size."
+            "Failed to retrieve file size."
         );
 
         try (
-                InputStream in = connection.getInputStream();
-                FileOutputStream out = new FileOutputStream(gameFile)
+            InputStream in = connection.getInputStream();
+            FileOutputStream out = new FileOutputStream(gameFile)
         ) {
             byte[] buffer = new byte[4096];
             int totalRead = 0,
-                    bytesRead;
+                bytesRead;
 
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
                 totalRead += bytesRead;
 
                 int progress = (int) ((totalRead / (double) contentLength) *
-                        100);
+                    100);
                 SwingUtilities.invokeLater(() ->
-                        progressBar.setValue(progress)
+                    progressBar.setValue(progress)
                 );
             }
         } finally {
@@ -241,7 +240,7 @@ public class Main {
             frame.setState(Frame.ICONIFIED);
         } catch (IOException e) {
             showErrorDialog(
-                    "Failed to run the game. Please check your Java installation."
+                "Failed to run the game. Please check your Java installation."
             );
             Log.error("Error running game", e);
         }
@@ -249,21 +248,21 @@ public class Main {
 
     private static void showErrorDialog(String message) {
         SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(
-                        frame,
-                        message,
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                )
+            JOptionPane.showMessageDialog(
+                frame,
+                message,
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            )
         );
     }
 
     private static ArrayList<String> fetchVersions() {
         ArrayList<String> versionList = new ArrayList<>();
         try (
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(new URI(VERSION_URL).toURL().openStream())
-                )
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new URI(VERSION_URL).toURL().openStream())
+            )
         ) {
             String line;
             while ((line = reader.readLine()) != null) {

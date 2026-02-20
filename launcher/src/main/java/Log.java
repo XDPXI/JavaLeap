@@ -4,20 +4,19 @@ import java.time.format.DateTimeFormatter;
 public class Log {
 
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private static void log(String level, String message, Object... args) {
         String formattedDateTime = LocalDateTime.now()
-                .format(FORMATTER)
-                .replace(" ", "] [");
-        String formattedMessage = args.length > 0
-                ? String.format(message, args)
-                : message;
+            .format(FORMATTER)
+            .replace(" ", "] [");
+        String formattedMessage =
+            args.length > 0 ? String.format(message, args) : message;
         System.out.printf(
-                "[%s] [%s] %s%n",
-                formattedDateTime,
-                level.toUpperCase(),
-                formattedMessage
+            "[%s] [%s] %s%n",
+            formattedDateTime,
+            level.toUpperCase(),
+            formattedMessage
         );
     }
 
