@@ -1,14 +1,13 @@
-package dev.xdpxi.pixelleap;
+package dev.xdpxi.javaleap;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import dev.xdpxi.pixelleap.Util.Log;
-
-import javax.swing.*;
+import dev.xdpxi.javaleap.Util.Log;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.*;
 
 public class Main {
 
@@ -18,13 +17,13 @@ public class Main {
     public static void main(String[] args) {
         Log.info("Application started");
         if (
-                System.getProperty("os.name").toLowerCase().contains("mac") &&
-                        !System.getProperty("java.vm.name")
-                                .toLowerCase()
-                                .contains("openjdk")
+            System.getProperty("os.name").toLowerCase().contains("mac") &&
+            !System.getProperty("java.vm.name")
+                .toLowerCase()
+                .contains("openjdk")
         ) {
             Log.error(
-                    "On macOS, this application must be run with -XstartOnFirstThread JVM argument"
+                "On macOS, this application must be run with -XstartOnFirstThread JVM argument"
             );
             System.exit(1);
         }
@@ -45,20 +44,20 @@ public class Main {
     private static String parseMapNumber(String[] args) {
         Log.info("Parsing command line arguments");
         return Arrays.stream(args)
-                .filter(arg -> arg.startsWith("--map"))
-                .findFirst()
-                .map(arg ->
-                        arg.contains("=")
-                                ? arg.split("=")[1]
-                                : args[Arrays.asList(args).indexOf(arg) + 1]
-                )
-                .orElse(null);
+            .filter(arg -> arg.startsWith("--map"))
+            .findFirst()
+            .map(arg ->
+                arg.contains("=")
+                    ? arg.split("=")[1]
+                    : args[Arrays.asList(args).indexOf(arg) + 1]
+            )
+            .orElse(null);
     }
 
     private static void getWidthAndHeight() {
         Log.info("Retrieving screen dimensions");
         GraphicsDevice defaultScreen =
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode displayMode = defaultScreen.getDisplayMode();
         width = displayMode.getWidth();
         height = displayMode.getHeight();
@@ -73,8 +72,8 @@ public class Main {
         } catch (UnsupportedLookAndFeelException e) {
             Log.error("Failed to set FlatDarkLaf look and feel", e);
             JOptionPane.showMessageDialog(
-                    null,
-                    "Failed to set FlatDarkLaf look and feel"
+                null,
+                "Failed to set FlatDarkLaf look and feel"
             );
         }
     }
@@ -82,23 +81,23 @@ public class Main {
     public static void restartApplication(int mapID) throws IOException {
         Log.info("Restarting application with map ID: " + mapID);
         String javaBin =
-                System.getProperty("java.home") +
-                        File.separator +
-                        "bin" +
-                        File.separator +
-                        "java";
+            System.getProperty("java.home") +
+            File.separator +
+            "bin" +
+            File.separator +
+            "java";
 
         File currentFile = new File(
-                Main.class.getProtectionDomain()
-                        .getCodeSource()
-                        .getLocation()
-                        .getPath()
+            Main.class.getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath()
         );
         Log.info("Current file: " + currentFile);
 
         if (!currentFile.exists()) {
             throw new IOException(
-                    "Unable to locate the running application file."
+                "Unable to locate the running application file."
             );
         }
 
@@ -107,16 +106,16 @@ public class Main {
 
         if (currentFile.getName().endsWith(".jar")) {
             command.addAll(
-                    Arrays.asList("-jar", currentFile.getPath(), "--map=" + mapID)
+                Arrays.asList("-jar", currentFile.getPath(), "--map=" + mapID)
             );
         } else {
             command.addAll(
-                    Arrays.asList(
-                            "-cp",
-                            currentFile.getPath(),
-                            Main.class.getName(),
-                            "--map=" + mapID
-                    )
+                Arrays.asList(
+                    "-cp",
+                    currentFile.getPath(),
+                    Main.class.getName(),
+                    "--map=" + mapID
+                )
             );
         }
 

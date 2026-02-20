@@ -1,11 +1,11 @@
-package dev.xdpxi.pixelleap;
+package dev.xdpxi.javaleap;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import dev.xdpxi.pixelleap.Entities.Player;
-import dev.xdpxi.pixelleap.Util.Log;
+import dev.xdpxi.javaleap.Entities.Player;
+import dev.xdpxi.javaleap.Util.Log;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -75,7 +75,7 @@ public class Game {
             window = glfwCreateWindow(
                 Main.width,
                 Main.height,
-                "Pixel Leap",
+                "JavaLeap",
                 NULL,
                 NULL
             );

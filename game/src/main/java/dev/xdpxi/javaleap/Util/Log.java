@@ -1,4 +1,4 @@
-package dev.xdpxi.pixelleap.Util;
+package dev.xdpxi.javaleap.Util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,16 +7,16 @@ import java.util.concurrent.*;
 public class Log {
 
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final BlockingQueue<LogEntry> LOG_QUEUE =
-            new LinkedBlockingQueue<>(10000);
+        new LinkedBlockingQueue<>(10000);
     private static final LogLevel CURRENT_LOG_LEVEL = LogLevel.INFO;
     private static final ExecutorService LOG_EXECUTOR =
-            Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "LoggerThread");
-                t.setDaemon(true);
-                return t;
-            });
+        Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "LoggerThread");
+            t.setDaemon(true);
+            return t;
+        });
 
     static {
         LOG_EXECUTOR.submit(Log::processLogQueue);
@@ -28,7 +28,7 @@ public class Log {
             LogEntry entry = new LogEntry(level, message, args);
             if (!LOG_QUEUE.offer(entry)) {
                 System.err.println(
-                        "Log queue full, discarding log entry: " + entry
+                    "Log queue full, discarding log entry: " + entry
                 );
             }
         }
@@ -40,16 +40,17 @@ public class Log {
                 LogEntry entry = LOG_QUEUE.poll(100, TimeUnit.MILLISECONDS);
                 if (entry != null) {
                     String formattedDateTime = LocalDateTime.now().format(
-                            FORMATTER
+                        FORMATTER
                     );
-                    String formattedMessage = entry.args.length > 0
+                    String formattedMessage =
+                        entry.args.length > 0
                             ? String.format(entry.message, entry.args)
                             : entry.message;
                     System.out.printf(
-                            "[%s] [%s] : %s%n",
-                            formattedDateTime,
-                            entry.level,
-                            formattedMessage
+                        "[%s] [%s] : %s%n",
+                        formattedDateTime,
+                        entry.level,
+                        formattedMessage
                     );
                 }
             } catch (InterruptedException e) {
@@ -92,6 +93,5 @@ public class Log {
         ERROR,
     }
 
-    private record LogEntry(LogLevel level, String message, Object[] args) {
-    }
+    private record LogEntry(LogLevel level, String message, Object[] args) {}
 }

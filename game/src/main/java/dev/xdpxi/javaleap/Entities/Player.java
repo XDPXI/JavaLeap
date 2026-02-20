@@ -1,10 +1,10 @@
-package dev.xdpxi.pixelleap.Entities;
+package dev.xdpxi.javaleap.Entities;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-import dev.xdpxi.pixelleap.Game;
-import dev.xdpxi.pixelleap.Maps;
-import dev.xdpxi.pixelleap.Util.Log;
+import dev.xdpxi.javaleap.Game;
+import dev.xdpxi.javaleap.Maps;
+import dev.xdpxi.javaleap.Util.Log;
 
 public class Player {
 

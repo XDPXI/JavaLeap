@@ -5,9 +5,9 @@ plugins {
 }
 
 group = 'dev.xdpxi'
-version = '1.0.0-beta.9'
+version = '1.0.0-beta.10'
 
-ext.lwjglVersion = "3.3.6"
+ext.lwjglVersion = "3.4.1"
 
 repositories {
     mavenCentral()
@@ -50,7 +50,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'dev.xdpxi.pixelleap.Main'
+    mainClass = 'dev.xdpxi.javaleap.Main'
     applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
 }
 
@@ -60,7 +60,7 @@ shadowJar {
 
     manifest {
         attributes(
-                'Main-Class': 'dev.xdpxi.pixelleap.Main'
+                'Main-Class': 'dev.xdpxi.javaleap.Main'
         )
     }
 }
@@ -69,7 +69,6 @@ jar {
     enabled = false
 }
 
-// Make distribution tasks depend on shadowJar
 distZip.dependsOn shadowJar
 distTar.dependsOn shadowJar
 startScripts.dependsOn shadowJar
