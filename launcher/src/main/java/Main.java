@@ -276,22 +276,26 @@ public class Main {
                 }
 
                 String[] parts = line.split(",");
-
-                if (parts.length != 4) continue;
+                if (parts.length < 4) continue;
 
                 String version = parts[0].trim();
-                boolean windows = Boolean.parseBoolean(parts[1].trim());
-                boolean linux = Boolean.parseBoolean(parts[2].trim());
-                boolean macos = Boolean.parseBoolean(parts[3].trim());
+                boolean windowsSupported = Boolean.parseBoolean(
+                    parts[1].trim()
+                );
+                boolean linuxSupported = Boolean.parseBoolean(parts[2].trim());
+                boolean macSupported = Boolean.parseBoolean(parts[3].trim());
 
-                boolean supported = switch (currentOS) {
-                    case "windows" -> windows;
-                    case "linux" -> linux;
-                    case "macos" -> macos;
-                    default -> false;
-                };
+                boolean isSupported = false;
 
-                if (supported) {
+                if (currentOS.equals("windows") && windowsSupported) {
+                    isSupported = true;
+                } else if (currentOS.equals("linux") && linuxSupported) {
+                    isSupported = true;
+                } else if (currentOS.equals("macos") && macSupported) {
+                    isSupported = true;
+                }
+
+                if (isSupported) {
                     versionList.add(version);
                 }
             }
