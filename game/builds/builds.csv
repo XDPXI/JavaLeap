@@ -1,0 +1,9 @@
+version,windows,linux,macos
+1.0.0-beta.9,true,true,true
+1.0.0-beta.8,true,true,false
+1.0.0-beta.7,true,true,false
+1.0.0-beta.6,true,true,false
+1.0.0-beta.5,true,true,false
+1.0.0-beta.4,true,true,false
+1.0.0-beta.2,true,true,false
+1.0.0-beta.1,true,true,false

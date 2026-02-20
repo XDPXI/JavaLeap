@@ -11,14 +11,14 @@ import javax.swing.*;
 public class Main {
 
     private static final String GAME_DOWNLOAD_DIR_WINDOWS =
-        "AppData/Roaming/PixelLeap";
-    private static final String GAME_DOWNLOAD_DIR_LINUX = ".config/PixelLeap";
+        "AppData/Roaming/JavaLeap";
+    private static final String GAME_DOWNLOAD_DIR_LINUX = ".config/JavaLeap";
     private static final String GAME_DOWNLOAD_DIR_MACOS =
-        "Library/Application Support/PixelLeap";
+        "Library/Application Support/JavaLeap";
     private static final String VERSION_URL =
-        "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/builds";
+        "https://raw.githubusercontent.com/XDPXI/JavaLeap/refs/heads/main/game/builds/builds.csv";
     private static final String GAME_BASE_URL =
-        "https://raw.githubusercontent.com/XDPXI/Pixel-Leap/refs/heads/main/game/builds/";
+        "https://raw.githubusercontent.com/XDPXI/JavaLeap/refs/heads/main/game/builds/";
     private static JFrame frame;
     private static JProgressBar progressBar;
     private static JButton playButton;
@@ -48,7 +48,7 @@ public class Main {
 
     private static void initUI() {
         SwingUtilities.invokeLater(() -> {
-            frame = new JFrame("Pixel Leap Launcher (1.0.4)");
+            frame = new JFrame("JavaLeap Launcher (1.0.5)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(330, 180);
             frame.setLayout(new BorderLayout());
@@ -259,19 +259,46 @@ public class Main {
 
     private static ArrayList<String> fetchVersions() {
         ArrayList<String> versionList = new ArrayList<>();
+        String currentOS = getOS();
+
         try (
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new URI(VERSION_URL).toURL().openStream())
             )
         ) {
             String line;
+            boolean isHeader = true;
+
             while ((line = reader.readLine()) != null) {
-                String trimmed = line.trim().replace("\"", "").replace(",", "");
-                if (!trimmed.isEmpty()) versionList.add(trimmed);
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+
+                if (parts.length != 4) continue;
+
+                String version = parts[0].trim();
+                boolean windows = Boolean.parseBoolean(parts[1].trim());
+                boolean linux = Boolean.parseBoolean(parts[2].trim());
+                boolean macos = Boolean.parseBoolean(parts[3].trim());
+
+                boolean supported = switch (currentOS) {
+                    case "windows" -> windows;
+                    case "linux" -> linux;
+                    case "macos" -> macos;
+                    default -> false;
+                };
+
+                if (supported) {
+                    versionList.add(version);
+                }
             }
         } catch (Exception e) {
             Log.error("Error fetching versions", e);
         }
+
         return versionList;
     }
 }
